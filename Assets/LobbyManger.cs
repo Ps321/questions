@@ -15,7 +15,7 @@ public class LobbyManger : MonoBehaviour
     //    public TMP_Text Name;
     public TMP_Text Email;
 
-    //    public TMP_Text username;
+       public TMP_Text username;
     //    public TMP_Text pno;
     public TMP_Text fiatbalance;
     public TMP_Text cashbalance;
@@ -80,6 +80,7 @@ public class LobbyManger : MonoBehaviour
 
                             // Fetch the user details
                             Email.text = userData["email"].ToString();
+                            username.text = userData["username"].ToString();
                             float fiatWalletValue = Convert.ToSingle(userData["fiatwallet"]);
                             fiatbalance.text = fiatWalletValue.ToString("F2");
                             float cashWalletValue = Convert.ToSingle(userData["cashwallet"]);
@@ -140,6 +141,10 @@ public class LobbyManger : MonoBehaviour
         {
             Debug.LogError("Failed to load profile picture: " + request.error);
         }
+    }
+
+    public void Reload(){
+        SceneManager.LoadScene(1);
     }
     
 }
