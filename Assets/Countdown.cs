@@ -13,15 +13,20 @@ public class Countdown : MonoBehaviour
     public GameObject start;
 
     public GameObject Countdowngameobject;
+    public GameManger gameManger;
 
 
     void Start()
     {
-        StartCoroutine(Countdown1());
+       
     }
 
-    IEnumerator Countdown1(){
-        yield return new WaitForSeconds(4);
+    public void startit(){
+       StartCoroutine(Countdown1()); 
+    }
+
+    public IEnumerator Countdown1(){
+        // yield return new WaitForSeconds(4);
         gametime.SetActive(false);
         c3.SetActive(true);
         yield return new WaitForSeconds(1);
@@ -40,6 +45,7 @@ public class Countdown : MonoBehaviour
         start.SetActive(true);
          yield return new WaitForSeconds(1);
         Countdowngameobject.SetActive(false);
+        gameManger.StartGame();
     }
 
     // Update is called once per frame
