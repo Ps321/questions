@@ -76,7 +76,8 @@ public class GameManger : MonoBehaviour
     int remainingTime = 0;
 
     public GameObject loading;
-
+    public TMP_Text Winamounttext;
+    public TMP_Text WinAmounPaneltext;
 
 
 
@@ -100,7 +101,7 @@ public class GameManger : MonoBehaviour
         FetchUserByPhoneNumber(phone);
     }
 
-     private void FetchUserByPhoneNumber(string phoneNumber)
+    private void FetchUserByPhoneNumber(string phoneNumber)
     {
         try
         {
@@ -127,22 +128,22 @@ public class GameManger : MonoBehaviour
                             // Get the UID of the user
                             string uid = document.Id;
                             Debug.Log($"User UID: {uid}");
-                            PlayerPrefs.SetString("uid",uid);
-                            PlayerPrefs.SetString("name",userData["fullName"].ToString());
-                            PlayerPrefs.SetString("email",userData["email"].ToString());
-                            PlayerPrefs.SetString("username",userData["username"].ToString());
-                            
+                            PlayerPrefs.SetString("uid", uid);
+                            PlayerPrefs.SetString("name", userData["fullName"].ToString());
+                            PlayerPrefs.SetString("email", userData["email"].ToString());
+                            PlayerPrefs.SetString("username", userData["username"].ToString());
 
-                           
+
+
                             float fiatWalletValue = Convert.ToSingle(userData["fiatwallet"]);
-                           
+
                             float cashWalletValue = Convert.ToSingle(userData["cashwallet"]);
-                            
+
                             PlayerPrefs.SetFloat("fiat", fiatWalletValue);
                             PlayerPrefs.SetFloat("cash", cashWalletValue);
 
                             // Fetch the profile picture URL and load it
-                             }
+                        }
                     }
                     else
                     {
@@ -163,7 +164,8 @@ public class GameManger : MonoBehaviour
             Debug.LogError($"Exception: {ex.Message}");
             // Signuperrortext.text = $"Error occurred: {ex.Message}";
         }
-        finally{
+        finally
+        {
             loading.SetActive(false);
         }
     }
@@ -175,6 +177,10 @@ public class GameManger : MonoBehaviour
     public void Lobby()
     {
         SceneManager.LoadScene(1);
+    }
+    public void Reload()
+    {
+        SceneManager.LoadScene(2);
     }
 
 
@@ -195,13 +201,13 @@ public class GameManger : MonoBehaviour
             winamount = 30;
             deductamount = 10;
 
+
         }
         if (level == "Medium")
         {
             if (fiat < 50 && cash < 50)
             {
-                error.text = "Insufficent Balance  \n Required Balance:- 50";
-                error.color = Color.red;
+                ToastNotification.Show("Insufficent Balance", 3, "error");
                 return;
             }
             winamount = 80;
@@ -211,14 +217,14 @@ public class GameManger : MonoBehaviour
         {
             if (fiat < 100 && cash < 100)
             {
-                error.text = "Insufficent Balance \n Required Balance:- 100";
-                error.color = Color.red;
+                ToastNotification.Show("Insufficent Balance", 3, "error");
                 return;
             }
 
             winamount = 170;
             deductamount = 100;
         }
+        Winamounttext.text = "INR " + winamount;
         difficultyscreen.SetActive(false);
         Countdownscreen.SetActive(true);
         FetchQuestionsByLevel(level);
@@ -436,13 +442,13 @@ public class GameManger : MonoBehaviour
         StartCoroutine(Starttimer());
         questionScreen.SetActive(true);
     }
-   
+
 
     IEnumerator Starttimer()
     {
         remainingTime = totalTime + additionalTime; // Calculate remaining time including additional time
 
-        while (remainingTime > 0) // Use a while loop to allow for dynamic time extension
+        while (remainingTime >= 0) // Use a while loop to allow for dynamic time extension
         {
             timer.text = remainingTime.ToString(); // Display the remaining time
             yield return new WaitForSeconds(1); // Wait for 1 second
@@ -490,6 +496,7 @@ public class GameManger : MonoBehaviour
             }
             else
             {
+                WinAmounPaneltext.text = winamount.ToString();
                 winscreen.SetActive(true);
                 AddMoneyFromWallet(PlayerPrefs.GetString("uid"), winamount);
 
@@ -539,7 +546,7 @@ public class GameManger : MonoBehaviour
     public void shownextquesscreen()
     {
 
-        additionalTime=0;
+        additionalTime = 0;
         index++;
         Showquestion();
         currentQuestion = "";
@@ -548,8 +555,8 @@ public class GameManger : MonoBehaviour
         answerimages[1].GetComponent<Image>().sprite = answersprites[0];
         answerimages[2].GetComponent<Image>().sprite = answersprites[0];
         answerimages[3].GetComponent<Image>().sprite = answersprites[0];
-        plus5.interactable=true;
-        fifty50.interactable=true;
+        plus5.interactable = true;
+        fifty50.interactable = true;
         option1.gameObject.SetActive(true);
         option2.gameObject.SetActive(true);
         option3.gameObject.SetActive(true);
@@ -609,8 +616,8 @@ public class GameManger : MonoBehaviour
 
     public void ShowTwoOptions()
     {
-       
-        fifty50.interactable=false;
+
+        fifty50.interactable = false;
         DeductMoneyFromWallet(PlayerPrefs.GetString("uid"), 20);
         // Get the correct answer and its index
         string correctAnswer = questionsList[index].answer.Substring(3);
@@ -688,10 +695,10 @@ public class GameManger : MonoBehaviour
 
 
 
-     public void OnAddTimeButtonClicked()
+    public void OnAddTimeButtonClicked()
     {
 
-        plus5.interactable=false;
+        plus5.interactable = false;
         DeductMoneyFromWallet(PlayerPrefs.GetString("uid"), 10);
         additionalTime += 5;
         Debug.Log($"Added 5 seconds! Total additional time: {additionalTime} seconds.");

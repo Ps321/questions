@@ -89,7 +89,7 @@ public class LobbyManger : MonoBehaviour
 
 
                             // Fetch the user details
-                            Email.text = userData["email"].ToString();
+                            Email.text = userData["username"].ToString();
                             username.text = userData["username"].ToString();
                             float fiatWalletValue = Convert.ToSingle(userData["fiatwallet"]);
                             fiatbalance.text = fiatWalletValue.ToString("F2");
@@ -97,8 +97,8 @@ public class LobbyManger : MonoBehaviour
                             cashbalance.text = cashWalletValue.ToString("F2");
                             PlayerPrefs.SetFloat("fiat", fiatWalletValue);
                             PlayerPrefs.SetFloat("cash", cashWalletValue);
-                            availablebalance1.text=cashWalletValue.ToString("F2");
-                            availablebalance2.text=fiatWalletValue.ToString("F2");
+                            availablebalance1.text = cashWalletValue.ToString("F2");
+                            availablebalance2.text = fiatWalletValue.ToString("F2");
 
 
                             // Fetch the profile picture URL and load it
@@ -196,7 +196,7 @@ public class LobbyManger : MonoBehaviour
     }
     public void DepositFiat()
     {
-         if (float.TryParse(depositcredit.text, out float depositAmount) && depositAmount > 0)
+        if (float.TryParse(depositcredit.text, out float depositAmount) && depositAmount > 0)
         {
             DepositCredit(PlayerPrefs.GetString("uid"), depositAmount);
         }
@@ -223,9 +223,9 @@ public class LobbyManger : MonoBehaviour
                     if (updateTask.IsCompleted)
                     {
                         Debug.Log("Deposit successful! New cashwallet balance: " + newBalance);
-                      
-                            availablebalance1.text=(PlayerPrefs.GetFloat("cash")+amount).ToString();
-                            LogTransaction(amount,"Deposit","Cash");
+
+                        availablebalance1.text = (PlayerPrefs.GetFloat("cash") + amount).ToString();
+                        LogTransaction(amount, "Deposit", "Cash");
                     }
                     else
                     {
@@ -260,9 +260,9 @@ public class LobbyManger : MonoBehaviour
                         if (updateTask.IsCompleted)
                         {
                             Debug.Log("Withdrawal successful! New cashwallet balance: " + newBalance);
-                           
-                            availablebalance1.text=(PlayerPrefs.GetFloat("cash")-amount).ToString();
-                            LogTransaction(amount,"Withdraw","Cash");
+
+                            availablebalance1.text = (PlayerPrefs.GetFloat("cash") - amount).ToString();
+                            LogTransaction(amount, "Withdraw", "Cash");
                         }
                         else
                         {
@@ -300,9 +300,9 @@ public class LobbyManger : MonoBehaviour
                     if (updateTask.IsCompleted)
                     {
                         Debug.Log("Deposit to fiatwallet successful! New balance: " + newFiatBalance);
-                      
-                        availablebalance2.text=(PlayerPrefs.GetFloat("fiat")+amount).ToString();
-                         LogTransaction(amount,"Deposit","Fiat");
+
+                        availablebalance2.text = (PlayerPrefs.GetFloat("fiat") + amount).ToString();
+                        LogTransaction(amount, "Deposit", "Fiat");
                     }
                     else
                     {
@@ -319,13 +319,13 @@ public class LobbyManger : MonoBehaviour
         });
     }
 
-    void LogTransaction( float amount, string transactionType, string walletType)
-{
-    // Get a reference to the transactions collection
-    DocumentReference transactionRef = db.Collection("transactions").Document();
+    void LogTransaction(float amount, string transactionType, string walletType)
+    {
+        // Get a reference to the transactions collection
+        DocumentReference transactionRef = db.Collection("transactions").Document();
 
-    // Prepare transaction data
-    var transactionData = new Dictionary<string, object>
+        // Prepare transaction data
+        var transactionData = new Dictionary<string, object>
     {
         { "userId", PlayerPrefs.GetString("uid") },
         { "name", PlayerPrefs.GetString("name") },
@@ -337,22 +337,22 @@ public class LobbyManger : MonoBehaviour
         { "timestamp", FieldValue.ServerTimestamp }  // Server-generated timestamp
     };
 
-    // Add transaction document to Firestore
-    transactionRef.SetAsync(transactionData).ContinueWithOnMainThread(task =>
-    {
-        if (task.IsCompleted)
+        // Add transaction document to Firestore
+        transactionRef.SetAsync(transactionData).ContinueWithOnMainThread(task =>
         {
-            Debug.Log("Transaction logged successfully!");
-              ToastNotification.Show("Transaction Successfull \n Taking you to Home Page", 3, "success");
-                        
-                        Invoke("Reload", 3.0f);
-        }
-        else
-        {
-            Debug.LogError("Failed to log transaction: " + task.Exception);
-        }
-    });
-}
+            if (task.IsCompleted)
+            {
+                Debug.Log("Transaction logged successfully!");
+                ToastNotification.Show("Transaction Successfull \n Taking you to Home Page", 3, "success");
+
+                Invoke("Reload", 3.0f);
+            }
+            else
+            {
+                Debug.LogError("Failed to log transaction: " + task.Exception);
+            }
+        });
+    }
 
 
 }

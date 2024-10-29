@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using Firebase;
 using Firebase.Extensions;
 using Firebase.Firestore;
 using TMPro;
@@ -16,29 +18,49 @@ public class LoginManager : MonoBehaviour
     public GameObject otp;
     public GameObject signup;
 
-    public Button resendOtpButton;  // Button to resend OTP
-    public TMP_Text timerText;          // Text to show countdown timer
-    public Text Signuperrortext;  
-    public Text loginerrortext;    // Error or success message
-    public Text otperrortext;    // Error or success message
-    
-    private string apiKey = "YOUR_API_KEY";  // Replace with your Fast2SMS API key
-    private string senderId = "KHELJN";      // Your sender ID
-    private string messageId = "170747";     // Template/message ID
+    public Button resendOtpButton;
+    public TMP_Text timerText;
+    public Text Signuperrortext;
+    public Text loginerrortext;
+    public Text otperrortext;
+
+    private string apiKey = "ZAPHPYGTJR1Fj8GxmmFfngNKkBgY9VH5w9IPe3KGHofLjrEW1uoQSiBn8jVC";
+    private string senderId = "KHELJN";
+    private string messageId = "170747";
     private string url = "https://www.fast2sms.com/dev/bulkV2";
     private FirebaseFirestore firestore;
-    private string generatedOTP; // Store the generated OTP here
-    private float countdownTime = 60f; // 60 seconds countdown
+    private string generatedOTP;
+    private float countdownTime = 60f;
 
-    private bool canResend = false; // Track whether OTP can be resent
+    private bool canResend = false;
+
+    public TMP_InputField emailInput;
+    public TMP_InputField fullNameInput;
+    public TMP_InputField usernameInput;
+    public TMP_InputField phoneNumberInput;
 
     void Start()
     {
-        firestore = FirebaseFirestore.DefaultInstance;
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                FirebaseApp app = FirebaseApp.DefaultInstance;
+                firestore = FirebaseFirestore.DefaultInstance;
+                Debug.Log("Firebase initialized successfully");
+            }
+            else
+            {
+                Debug.LogError("Firebase initialization failed: " + task.Exception);
+                ToastNotification.Show("Firebase initialization failed", 3.0f, "error");
+            }
+        });
+
         resendOtpButton.onClick.AddListener(OnResendOTPClicked);
-        resendOtpButton.interactable = false;  
-        timerText.text = "";                   
+        resendOtpButton.interactable = false;
+        timerText.text = "";
     }
+
 
     public void Login()
     {
@@ -46,8 +68,7 @@ public class LoginManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(phoneNumber))
         {
-            Signuperrortext.text = "Phone number is required!";
-            Signuperrortext.color = Color.red;
+            ToastNotification.Show("Phone number is required!", 3.0f, "error");
             return;
         }
 
@@ -58,7 +79,6 @@ public class LoginManager : MonoBehaviour
     {
         CollectionReference usersRef = firestore.Collection("users");
 
-        // Query Firestore for existing phone number
         Query query = usersRef.WhereEqualTo("phoneNumber", phoneNumber);
 
         query.GetSnapshotAsync().ContinueWithOnMainThread(task =>
@@ -69,42 +89,34 @@ public class LoginManager : MonoBehaviour
 
                 if (documents.Count > 0)
                 {
-                    // Phone number exists, generate and send OTP
                     string otp1 = GenerateOTP();
-                    // StartCoroutine(SendOTP(phoneNumber, otp1));
-                    Debug.Log(otp1);
-                    generatedOTP = otp1; // Store the OTP for later verification
-                    otperrortext.text = "OTP sent to your phone!";
-                    otperrortext.color = Color.green;
+                    StartCoroutine(SendOTP(phoneNumber, otp1));
+                    generatedOTP = otp1;
+                    ToastNotification.Show("OTP sent to your phone!", 3.0f, "success");
                     login.SetActive(false);
                     otp.SetActive(true);
 
-                    // Start the countdown for Resend OTP
                     StartCoroutine(StartOtpCountdown());
                 }
                 else
                 {
-                    loginerrortext.text = "Phone number does not exist!";
-                    loginerrortext.color = Color.red;
+                    ToastNotification.Show("Phone number does not exist!", 3.0f, "error");
                 }
             }
             else
             {
-                loginerrortext.text = "Error checking phone number!";
-                loginerrortext.color = Color.red;
+                ToastNotification.Show("Error checking phone number!", 3.0f, "error");
             }
         });
     }
 
     private string GenerateOTP()
     {
-        // Generate a random 6-digit OTP
-        return Random.Range(100000, 999999).ToString();
+        return UnityEngine.Random.Range(100000, 999999).ToString();
     }
 
     public IEnumerator SendOTP(string phone, string otp)
     {
-        // Prepare JSON payload
         string jsonData = JsonUtility.ToJson(new Fast2SMSRequest
         {
             route = "dlt",
@@ -115,24 +127,20 @@ public class LoginManager : MonoBehaviour
             numbers = phone
         });
 
-        // Create request
         UnityWebRequest request = new UnityWebRequest(url, "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
 
-        // Set headers and body
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
         request.SetRequestHeader("authorization", apiKey);
 
-        // Send request and wait for response
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
             Debug.LogError("Error: " + request.error);
-            Signuperrortext.text = "Failed to send OTP!";
-            Signuperrortext.color = Color.red;
+            ToastNotification.Show("Failed to send OTP!", 3.0f, "error");
         }
         else
         {
@@ -140,10 +148,9 @@ public class LoginManager : MonoBehaviour
         }
     }
 
-    // Countdown Timer for Resend OTP
     private IEnumerator StartOtpCountdown()
     {
-        resendOtpButton.interactable = false;  // Disable Resend OTP button
+        resendOtpButton.interactable = false;
 
         float remainingTime = countdownTime;
 
@@ -154,12 +161,16 @@ public class LoginManager : MonoBehaviour
             remainingTime -= 1.0f;
         }
 
-        timerText.text = "";                    // Clear the timer text when finished
-        resendOtpButton.interactable = true;    // Enable Resend OTP button
-        canResend = true;                       // Allow the user to resend OTP
+        timerText.text = "";
+        resendOtpButton.interactable = true;
+        canResend = true;
     }
 
-    // Handle Resend OTP click event
+    public void Google()
+    {
+        ToastNotification.Show("Api Keys Expired", 3, "error");
+    }
+
     private void OnResendOTPClicked()
     {
         if (canResend)
@@ -168,19 +179,16 @@ public class LoginManager : MonoBehaviour
 
             if (!string.IsNullOrEmpty(phoneNumber))
             {
-                string otp = GenerateOTP();    // Generate new OTP
+                string otp = GenerateOTP();
                 StartCoroutine(SendOTP(phoneNumber, otp));
-                generatedOTP = otp;            // Update the generated OTP
-                otperrortext.text = "OTP resent!";
-                otperrortext.color = Color.green;
+                generatedOTP = otp;
+                ToastNotification.Show("OTP resent!", 3.0f, "success");
 
-                // Start the countdown again
                 StartCoroutine(StartOtpCountdown());
             }
             else
             {
-                otperrortext.text = "Enter your phone number!";
-                otperrortext.color = Color.red;
+                ToastNotification.Show("Enter your phone number!", 3.0f, "error");
             }
         }
     }
@@ -191,29 +199,111 @@ public class LoginManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(enteredOTP))
         {
-            otperrortext.text = "Please enter the OTP!";
-            otperrortext.color = Color.red;
+            ToastNotification.Show("Please enter the OTP!", 3.0f, "error");
             return;
         }
 
         if (enteredOTP == generatedOTP)
         {
-            otperrortext.text = "OTP verified successfully!";
-            otperrortext.color = Color.green;
-            // Proceed to the next step (e.g., logging in or navigating to another scene)
-            PlayerPrefs.SetString("pno",loginpno.text);
-            
+            ToastNotification.Show("OTP verified successfully!", 3.0f, "success");
+            PlayerPrefs.SetString("pno", loginpno.text);
             SceneManager.LoadScene(1);
-             // Load the next scene
         }
         else
         {
-            otperrortext.text = "Incorrect OTP!";
-            otperrortext.color = Color.red;
+            ToastNotification.Show("Incorrect OTP!", 3.0f, "error");
         }
     }
 
-    // Structure for JSON request
+    public void OnSignupButtonClicked()
+    {
+        string email = emailInput.text;
+        string fullName = fullNameInput.text;
+        string username = usernameInput.text;
+        string phoneNumber = phoneNumberInput.text;
+
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(phoneNumber))
+        {
+            ToastNotification.Show("All fields are required!", 3.0f, "error");
+            return;
+        }
+
+        CheckIfUserExists(email, username, phoneNumber, fullName);
+    }
+
+    private void CheckIfUserExists(string email, string username, string phoneNumber, string fullName)
+    {
+        CollectionReference usersRef = firestore.Collection("users");
+
+        try
+        {
+            Query query = usersRef
+                .WhereEqualTo("email", email)
+                .WhereEqualTo("username", username)
+                .WhereEqualTo("phoneNumber", phoneNumber);
+
+            query.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+            {
+                try
+                {
+                    if (task.IsCompleted)
+                    {
+                        var documents = task.Result;
+                        if (documents.Count > 0)
+                        {
+                            ToastNotification.Show("User with this email, username, or phone number already exists!", 3.0f, "error");
+                        }
+                        else
+                        {
+                            SaveUserToFirestore(email, fullName, username, phoneNumber);
+                        }
+                    }
+                    else
+                    {
+                        ToastNotification.Show("Error checking user data!", 3.0f, "error");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError("Error processing Firestore query result: " + ex.Message);
+                    ToastNotification.Show("An error occurred!", 3.0f, "error");
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Error executing Firestore query: " + ex.Message);
+            ToastNotification.Show("Failed to check user data!", 3.0f, "error");
+        }
+    }
+
+    private void SaveUserToFirestore(string email, string fullName, string username, string phoneNumber)
+    {
+        CollectionReference usersCollectionRef = firestore.Collection("users");
+
+        var userData = new
+        {
+            email = email,
+            fullName = fullName,
+            username = username,
+            phoneNumber = phoneNumber,
+            cashwallet = 0.0,
+            fiatwallet = 10.0
+        };
+
+        usersCollectionRef.AddAsync(userData).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                ToastNotification.Show("User signed up successfully!", 3.0f, "success");
+            }
+            else
+            {
+                ToastNotification.Show("Error saving user data!", 3.0f, "error");
+            }
+        });
+    }
+
     [System.Serializable]
     public class Fast2SMSRequest
     {
