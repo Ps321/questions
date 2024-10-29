@@ -36,8 +36,8 @@ public class LoginManager : MonoBehaviour
     {
         firestore = FirebaseFirestore.DefaultInstance;
         resendOtpButton.onClick.AddListener(OnResendOTPClicked);
-        resendOtpButton.interactable = false;  // Initially disable the Resend OTP button
-        timerText.text = "";                   // Clear timer text
+        resendOtpButton.interactable = false;  
+        timerText.text = "";                   
     }
 
     public void Login()
@@ -201,7 +201,10 @@ public class LoginManager : MonoBehaviour
             otperrortext.text = "OTP verified successfully!";
             otperrortext.color = Color.green;
             // Proceed to the next step (e.g., logging in or navigating to another scene)
-            SceneManager.LoadScene(1); // Load the next scene
+            PlayerPrefs.SetString("pno",loginpno.text);
+            
+            SceneManager.LoadScene(1);
+             // Load the next scene
         }
         else
         {
