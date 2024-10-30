@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "KBC GAME.sln"
+    "dotnet.defaultSolution": "questions.sln"
 }

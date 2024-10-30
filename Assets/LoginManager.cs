@@ -232,50 +232,51 @@ public class LoginManager : MonoBehaviour
     }
 
     private void CheckIfUserExists(string email, string username, string phoneNumber, string fullName)
+{
+    CollectionReference usersRef = firestore.Collection("users");
+
+    // Query for each field independently
+    Query emailQuery = usersRef.WhereEqualTo("email", email);
+    Query usernameQuery = usersRef.WhereEqualTo("username", username);
+    Query phoneNumberQuery = usersRef.WhereEqualTo("phoneNumber", phoneNumber);
+
+    // Check each field one by one
+    emailQuery.GetSnapshotAsync().ContinueWithOnMainThread(emailTask =>
     {
-        CollectionReference usersRef = firestore.Collection("users");
-
-        try
+        if (emailTask.IsCompleted && emailTask.Result.Count > 0)
         {
-            Query query = usersRef
-                .WhereEqualTo("email", email)
-                .WhereEqualTo("username", username)
-                .WhereEqualTo("phoneNumber", phoneNumber);
-
-            query.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+            ToastNotification.Show("Email already exists!", 3.0f, "error");
+        }
+        else
+        {
+            // Check username
+            usernameQuery.GetSnapshotAsync().ContinueWithOnMainThread(usernameTask =>
             {
-                try
+                if (usernameTask.IsCompleted && usernameTask.Result.Count > 0)
                 {
-                    if (task.IsCompleted)
+                    ToastNotification.Show("Username already exists!", 3.0f, "error");
+                }
+                else
+                {
+                    // Check phone number
+                    phoneNumberQuery.GetSnapshotAsync().ContinueWithOnMainThread(phoneTask =>
                     {
-                        var documents = task.Result;
-                        if (documents.Count > 0)
+                        if (phoneTask.IsCompleted && phoneTask.Result.Count > 0)
                         {
-                            ToastNotification.Show("User with this email, username, or phone number already exists!", 3.0f, "error");
+                            ToastNotification.Show("Phone number already exists!", 3.0f, "error");
                         }
                         else
                         {
+                            // All checks passed, save the user
                             SaveUserToFirestore(email, fullName, username, phoneNumber);
                         }
-                    }
-                    else
-                    {
-                        ToastNotification.Show("Error checking user data!", 3.0f, "error");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError("Error processing Firestore query result: " + ex.Message);
-                    ToastNotification.Show("An error occurred!", 3.0f, "error");
+                    });
                 }
             });
         }
-        catch (Exception ex)
-        {
-            Debug.LogError("Error executing Firestore query: " + ex.Message);
-            ToastNotification.Show("Failed to check user data!", 3.0f, "error");
-        }
-    }
+    });
+}
+
 
     private void SaveUserToFirestore(string email, string fullName, string username, string phoneNumber)
     {
