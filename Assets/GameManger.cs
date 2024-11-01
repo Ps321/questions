@@ -99,6 +99,7 @@ public class GameManger : MonoBehaviour
         }
 
         FetchUserByPhoneNumber(phone);
+
     }
 
     private void FetchUserByPhoneNumber(string phoneNumber)
@@ -391,6 +392,7 @@ public class GameManger : MonoBehaviour
                Debug.Log("aaya");
                PlayerPrefs.SetFloat("cash", PlayerPrefs.GetFloat("cash") + amount);
                Debug.Log($"Added {amount} from user's wallet.");
+
            }
        });
 
@@ -399,8 +401,48 @@ public class GameManger : MonoBehaviour
     }
 
 
+    public void UpdateWinCount(string playerName, float amount)
+{
+    try
+    {
+        // Reference to the player's document in Firestore
+        DocumentReference docRef = db.Collection("leaderboard").Document(playerName);
 
+        // Prepare the data with all fields to either update or set if missing
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        {
+            { "name", PlayerPrefs.GetString("name") },
+            { "email", PlayerPrefs.GetString("email") },
+            { "pno", PlayerPrefs.GetString("pno") },
+            { "profilePictureUrl", PlayerPrefs.GetString("profilepic") },
+            { "score", FieldValue.Increment(amount) } // Will increment score if field exists, or initialize if it doesn’t
+        };
 
+        // Use SetAsync with Merge option to update or create the document
+        docRef.SetAsync(updates, SetOptions.MergeAll).ContinueWithOnMainThread(setTask =>
+        {
+            try
+            {
+                if (setTask.IsFaulted)
+                {
+                    Debug.LogError("Error updating or creating leaderboard entry: " + setTask.Exception);
+                }
+                else
+                {
+                    Debug.Log("Leaderboard entry successfully updated or created for player: " + playerName);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("Exception in updating or creating leaderboard entry: " + e.Message);
+            }
+        });
+    }
+    catch (System.Exception e)
+    {
+        Debug.LogError("Exception in UpdateWinCount: " + e.Message);
+    }
+}
     private async void StoreAttemptedQuestion(string questionUid)
     {
         // Assume you have a method to get the current user's ID
@@ -499,7 +541,7 @@ public class GameManger : MonoBehaviour
                 WinAmounPaneltext.text = winamount.ToString();
                 winscreen.SetActive(true);
                 AddMoneyFromWallet(PlayerPrefs.GetString("uid"), winamount);
-
+                UpdateWinCount(PlayerPrefs.GetString("uid"), winamount);
             }
 
 

@@ -111,6 +111,7 @@ public class LobbyManger : MonoBehaviour
                             else
                             {
                                 Debug.Log("No profile picture found!");
+                                PlayerPrefs.SetString("profilepic","");
                             }
 
                             // Log or display fetched data
