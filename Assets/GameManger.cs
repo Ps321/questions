@@ -199,7 +199,7 @@ public class GameManger : MonoBehaviour
                 ToastNotification.Show("Insufficent Balance", 3, "error");
                 return;
             }
-            winamount = 30;
+            winamount = 50;
             deductamount = 10;
 
 
@@ -402,14 +402,14 @@ public class GameManger : MonoBehaviour
 
 
     public void UpdateWinCount(string playerName, float amount)
-{
-    try
     {
-        // Reference to the player's document in Firestore
-        DocumentReference docRef = db.Collection("leaderboard").Document(playerName);
+        try
+        {
+            // Reference to the player's document in Firestore
+            DocumentReference docRef = db.Collection("leaderboard").Document(playerName);
 
-        // Prepare the data with all fields to either update or set if missing
-        Dictionary<string, object> updates = new Dictionary<string, object>
+            // Prepare the data with all fields to either update or set if missing
+            Dictionary<string, object> updates = new Dictionary<string, object>
         {
             { "name", PlayerPrefs.GetString("name") },
             { "email", PlayerPrefs.GetString("email") },
@@ -418,31 +418,31 @@ public class GameManger : MonoBehaviour
             { "score", FieldValue.Increment(amount) } // Will increment score if field exists, or initialize if it doesn’t
         };
 
-        // Use SetAsync with Merge option to update or create the document
-        docRef.SetAsync(updates, SetOptions.MergeAll).ContinueWithOnMainThread(setTask =>
+            // Use SetAsync with Merge option to update or create the document
+            docRef.SetAsync(updates, SetOptions.MergeAll).ContinueWithOnMainThread(setTask =>
+            {
+                try
+                {
+                    if (setTask.IsFaulted)
+                    {
+                        Debug.LogError("Error updating or creating leaderboard entry: " + setTask.Exception);
+                    }
+                    else
+                    {
+                        Debug.Log("Leaderboard entry successfully updated or created for player: " + playerName);
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Exception in updating or creating leaderboard entry: " + e.Message);
+                }
+            });
+        }
+        catch (System.Exception e)
         {
-            try
-            {
-                if (setTask.IsFaulted)
-                {
-                    Debug.LogError("Error updating or creating leaderboard entry: " + setTask.Exception);
-                }
-                else
-                {
-                    Debug.Log("Leaderboard entry successfully updated or created for player: " + playerName);
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError("Exception in updating or creating leaderboard entry: " + e.Message);
-            }
-        });
+            Debug.LogError("Exception in UpdateWinCount: " + e.Message);
+        }
     }
-    catch (System.Exception e)
-    {
-        Debug.LogError("Exception in UpdateWinCount: " + e.Message);
-    }
-}
     private async void StoreAttemptedQuestion(string questionUid)
     {
         // Assume you have a method to get the current user's ID
