@@ -383,8 +383,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3.6652, y: 72}
-  m_SizeDelta: {x: 720.462, y: 427.6877}
+  m_AnchoredPosition: {x: 25.402, y: 173}
+  m_SizeDelta: {x: 1829.2, y: 427.6877}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &18494871
 MonoBehaviour:
@@ -406,17 +406,20 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: This is a dummy Screen as of now when you give write answer
+  m_text: 'Congratulations!
+
+
+    Let''s Jump on to next question'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: fa4606e9b70b27c4698bf3883767049c, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: fa4606e9b70b27c4698bf3883767049c, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278255404
+  m_fontColor: {r: 0.17174888, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -439,7 +442,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -469,7 +472,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -484.1022, y: -474.9102, z: -493.29388, w: 435.07898}
+  m_margin: {x: 3.2713926, y: 2.0199432, z: 42.817017, w: 6.8859634}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -770,7 +773,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &48882800
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3996,7 +3999,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &461454524
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4643,8 +4646,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -490, y: 937}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: -555, y: 1059}
+  m_SizeDelta: {x: 48, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &541599423
 MonoBehaviour:
@@ -4722,7 +4725,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9a7bc1170f3d9b14c814855894afcf29, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 49d82cebeab54444893f8195164f5251, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -10311,7 +10314,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1880, y: 2000}
+  m_SizeDelta: {x: 1880, y: 1300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1265042629
 MonoBehaviour:
@@ -10386,8 +10389,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00001001358, y: -439}
-  m_SizeDelta: {x: 720.462, y: 427.6877}
+  m_AnchoredPosition: {x: -0.00001001358, y: 0.000091553}
+  m_SizeDelta: {x: 720.462, y: 264}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1265169035
 MonoBehaviour:
@@ -10409,7 +10412,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Next ques
+  m_text: Next question
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10472,7 +10475,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -484.1022, y: -336.80405, z: -493.29388, w: 532.6738}
+  m_margin: {x: -60.654785, y: 8.1195755, z: -65.69537, w: 13.74334}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -14692,12 +14695,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _messagePrefab: {fileID: 7001399534701900153, guid: 993f3c0579c2ec243bd931e9e23be749, type: 3}
   _showTimerRender: 1
-  _darkTheme: 0
+  _darkTheme: 1
   _minimumMessageTime: 3
-  _margin: {x: 20, y: 100}
+  _margin: {x: 200, y: 100}
   _stopOnOver: 1
   _hideOnClick: 1
-  _messageScreenPosition: 2
+  _messageScreenPosition: 1
   _timerDirection: 0
 --- !u!225 &1785917568
 CanvasGroup:
@@ -17817,7 +17820,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3.6651917, y: -213}
+  m_AnchoredPosition: {x: 3.6651917, y: -324}
   m_SizeDelta: {x: 900, y: 264}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2090754639

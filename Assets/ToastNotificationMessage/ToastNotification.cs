@@ -169,6 +169,7 @@ public class ToastNotification : MonoBehaviour, IPointerEnterHandler, IPointerEx
         // Get IMAGE component of text, icons, timer and background
         TextMeshProUGUI text = message.Find("Text").GetComponent<TextMeshProUGUI>();
         UnityEngine.UI.Image background = message.Find("Background").GetComponent<UnityEngine.UI.Image>();
+        background.color=iconName=="error"?Color.red:Color.green;
         Transform icons = message.Find("Icons");
         UnityEngine.UI.Image timer = message.Find("Timer").GetComponent<UnityEngine.UI.Image>();
         UnityEngine.UI.Image selectedIcon = null;

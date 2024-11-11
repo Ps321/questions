@@ -39,8 +39,14 @@ public class LoginManager : MonoBehaviour
     public TMP_InputField usernameInput;
     public TMP_InputField phoneNumberInput;
 
+    public Toggle checkbox;
+
+    public GameObject loading;
+    PanelManager pp;
+
     void Start()
     {
+        pp=gameObject.GetComponent<PanelManager>();
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompletedSuccessfully)
@@ -77,6 +83,7 @@ public class LoginManager : MonoBehaviour
 
     private void CheckIfPhoneNumberExists(string phoneNumber)
     {
+        loading.SetActive(true);
         CollectionReference usersRef = firestore.Collection("users");
 
         Query query = usersRef.WhereEqualTo("phoneNumber", phoneNumber);
@@ -95,17 +102,21 @@ public class LoginManager : MonoBehaviour
                     ToastNotification.Show("OTP sent to your phone!", 3.0f, "success");
                     login.SetActive(false);
                     otp.SetActive(true);
+                    pp.ShowPanel(otp);
 
                     StartCoroutine(StartOtpCountdown());
                 }
                 else
                 {
                     ToastNotification.Show("Phone number does not exist!", 3.0f, "error");
+                    loading.SetActive(false);
                 }
             }
             else
             {
                 ToastNotification.Show("Error checking phone number!", 3.0f, "error");
+                    loading.SetActive(false);
+
             }
         });
     }
@@ -141,11 +152,15 @@ public class LoginManager : MonoBehaviour
         {
             Debug.LogError("Error: " + request.error);
             ToastNotification.Show("Failed to send OTP!", 3.0f, "error");
+            
         }
         else
         {
             Debug.Log("Response: " + request.downloadHandler.text);
+
         }
+                    loading.SetActive(false);
+
     }
 
     private IEnumerator StartOtpCountdown()
@@ -161,7 +176,8 @@ public class LoginManager : MonoBehaviour
             remainingTime -= 1.0f;
         }
 
-        timerText.text = "";
+        timerText.text = "Resend";
+        timerText.color=Color.black;
         resendOtpButton.interactable = true;
         canResend = true;
     }
@@ -173,6 +189,7 @@ public class LoginManager : MonoBehaviour
 
     private void OnResendOTPClicked()
     {
+        loading.SetActive(true);
         if (canResend)
         {
             string phoneNumber = loginpno.text;
@@ -189,6 +206,7 @@ public class LoginManager : MonoBehaviour
             else
             {
                 ToastNotification.Show("Enter your phone number!", 3.0f, "error");
+                    loading.SetActive(false);
             }
         }
     }
@@ -222,6 +240,11 @@ public class LoginManager : MonoBehaviour
         string username = usernameInput.text;
         string phoneNumber = phoneNumberInput.text;
 
+        if(!checkbox.isOn){
+            ToastNotification.Show("Please Agree to Terms & Conditions", 3.0f, "error");
+            return; 
+        }
+
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(fullName) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(phoneNumber))
         {
             ToastNotification.Show("All fields are required!", 3.0f, "error");
@@ -233,6 +256,8 @@ public class LoginManager : MonoBehaviour
 
     private void CheckIfUserExists(string email, string username, string phoneNumber, string fullName)
 {
+                    loading.SetActive(true);
+
     CollectionReference usersRef = firestore.Collection("users");
 
     // Query for each field independently
@@ -246,6 +271,8 @@ public class LoginManager : MonoBehaviour
         if (emailTask.IsCompleted && emailTask.Result.Count > 0)
         {
             ToastNotification.Show("Email already exists!", 3.0f, "error");
+                    loading.SetActive(false);
+
         }
         else
         {
@@ -255,6 +282,8 @@ public class LoginManager : MonoBehaviour
                 if (usernameTask.IsCompleted && usernameTask.Result.Count > 0)
                 {
                     ToastNotification.Show("Username already exists!", 3.0f, "error");
+                    loading.SetActive(false);
+
                 }
                 else
                 {
@@ -264,6 +293,8 @@ public class LoginManager : MonoBehaviour
                         if (phoneTask.IsCompleted && phoneTask.Result.Count > 0)
                         {
                             ToastNotification.Show("Phone number already exists!", 3.0f, "error");
+                    loading.SetActive(false);
+
                         }
                         else
                         {
@@ -302,6 +333,8 @@ public class LoginManager : MonoBehaviour
             {
                 ToastNotification.Show("Error saving user data!", 3.0f, "error");
             }
+                    loading.SetActive(false);
+
         });
     }
 

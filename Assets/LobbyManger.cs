@@ -30,6 +30,11 @@ public class LobbyManger : MonoBehaviour
 
     public TMP_Text availablebalance2;
 
+    public TMP_InputField feedback;
+
+    public TMP_InputField bugreport;
+
+    public PanelManager pp;
 
 
 
@@ -111,7 +116,7 @@ public class LobbyManger : MonoBehaviour
                             else
                             {
                                 Debug.Log("No profile picture found!");
-                                PlayerPrefs.SetString("profilepic","");
+                                PlayerPrefs.SetString("profilepic", "");
                             }
 
                             // Log or display fetched data
@@ -351,6 +356,58 @@ public class LobbyManger : MonoBehaviour
             else
             {
                 Debug.LogError("Failed to log transaction: " + task.Exception);
+            }
+        });
+    }
+
+
+    public void SubmitFeedback(string type="")
+    {
+       
+       if(type=="bug" && bugreport.text==""){
+         ToastNotification.Show("Enter a valid Bug Report", 3, "error");
+         return;
+       }
+
+        if(type=="feedback" && feedback.text==""){
+         ToastNotification.Show("Enter a valid Feedback Report", 3, "error");
+         return;
+       }
+       
+
+
+        DocumentReference transactionRef = db.Collection("feedbacks").Document();
+
+        // Prepare transaction data
+        var transactionData = new Dictionary<string, object>
+    {
+        { "userId", PlayerPrefs.GetString("uid") },
+        { "name", PlayerPrefs.GetString("name") },
+        { "pno", PlayerPrefs.GetString("pno") },
+        { "email", PlayerPrefs.GetString("email") },
+        { "feedback",  type=="bug"?bugreport.text:feedback.text},
+        { "type",  type=="bug"?"Bug":"Feedback" },  // "deposit" or "withdraw"
+       
+        { "timestamp", FieldValue.ServerTimestamp }  // Server-generated timestamp
+    };
+
+        // Add transaction document to Firestore
+        transactionRef.SetAsync(transactionData).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("Transaction logged successfully!");
+                ToastNotification.Show("Your report has been successfully reported \n Taking you to Home Page", 3, "success");
+
+               pp.GoBack();
+               feedback.text="";
+               bugreport.text="";
+            }
+            else
+            {
+                Debug.LogError("Failed to log transaction: " + task.Exception);
+                  ToastNotification.Show("Error in Submitting report to database", 3, "error");
+
             }
         });
     }
