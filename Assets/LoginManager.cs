@@ -207,12 +207,19 @@ public class LoginManager : MonoBehaviour
         {
             ToastNotification.Show("OTP verified successfully!", 3.0f, "success");
             PlayerPrefs.SetString("pno", loginpno.text);
-            SceneManager.LoadScene(1);
+            StartCoroutine(nextloadscreen());
         }
         else
         {
             ToastNotification.Show("Incorrect OTP!", 3.0f, "error");
         }
+    }
+
+    IEnumerator nextloadscreen()
+    {
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene(1);
+
     }
 
     public void OnSignupButtonClicked()
@@ -232,50 +239,50 @@ public class LoginManager : MonoBehaviour
     }
 
     private void CheckIfUserExists(string email, string username, string phoneNumber, string fullName)
-{
-    CollectionReference usersRef = firestore.Collection("users");
-
-    // Query for each field independently
-    Query emailQuery = usersRef.WhereEqualTo("email", email);
-    Query usernameQuery = usersRef.WhereEqualTo("username", username);
-    Query phoneNumberQuery = usersRef.WhereEqualTo("phoneNumber", phoneNumber);
-
-    // Check each field one by one
-    emailQuery.GetSnapshotAsync().ContinueWithOnMainThread(emailTask =>
     {
-        if (emailTask.IsCompleted && emailTask.Result.Count > 0)
+        CollectionReference usersRef = firestore.Collection("users");
+
+        // Query for each field independently
+        Query emailQuery = usersRef.WhereEqualTo("email", email);
+        Query usernameQuery = usersRef.WhereEqualTo("username", username);
+        Query phoneNumberQuery = usersRef.WhereEqualTo("phoneNumber", phoneNumber);
+
+        // Check each field one by one
+        emailQuery.GetSnapshotAsync().ContinueWithOnMainThread(emailTask =>
         {
-            ToastNotification.Show("Email already exists!", 3.0f, "error");
-        }
-        else
-        {
-            // Check username
-            usernameQuery.GetSnapshotAsync().ContinueWithOnMainThread(usernameTask =>
+            if (emailTask.IsCompleted && emailTask.Result.Count > 0)
             {
-                if (usernameTask.IsCompleted && usernameTask.Result.Count > 0)
+                ToastNotification.Show("Email already exists!", 3.0f, "error");
+            }
+            else
+            {
+                // Check username
+                usernameQuery.GetSnapshotAsync().ContinueWithOnMainThread(usernameTask =>
                 {
-                    ToastNotification.Show("Username already exists!", 3.0f, "error");
-                }
-                else
-                {
-                    // Check phone number
-                    phoneNumberQuery.GetSnapshotAsync().ContinueWithOnMainThread(phoneTask =>
+                    if (usernameTask.IsCompleted && usernameTask.Result.Count > 0)
                     {
-                        if (phoneTask.IsCompleted && phoneTask.Result.Count > 0)
+                        ToastNotification.Show("Username already exists!", 3.0f, "error");
+                    }
+                    else
+                    {
+                        // Check phone number
+                        phoneNumberQuery.GetSnapshotAsync().ContinueWithOnMainThread(phoneTask =>
                         {
-                            ToastNotification.Show("Phone number already exists!", 3.0f, "error");
-                        }
-                        else
-                        {
-                            // All checks passed, save the user
-                            SaveUserToFirestore(email, fullName, username, phoneNumber);
-                        }
-                    });
-                }
-            });
-        }
-    });
-}
+                            if (phoneTask.IsCompleted && phoneTask.Result.Count > 0)
+                            {
+                                ToastNotification.Show("Phone number already exists!", 3.0f, "error");
+                            }
+                            else
+                            {
+                                // All checks passed, save the user
+                                SaveUserToFirestore(email, fullName, username, phoneNumber);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
 
 
     private void SaveUserToFirestore(string email, string fullName, string username, string phoneNumber)
